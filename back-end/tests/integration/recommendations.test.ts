@@ -90,3 +90,49 @@ describe("Testes na rota Post:/recommendations/:id/upvote", () => {
     expect(result.status).toEqual(404);
   });
 });
+
+describe("Testes na rota Post:/recommendations/:id/downvote", () => {
+  it("Caso sucesso: retornar 200 e diminuir 1 ao score a cada requisição", async () => {
+    const recommendation = recommendationFactory();
+    const { id, score } = await prisma.recommendation.create({
+      data: recommendation,
+    });
+    const result = await supertest(app)
+      .post(`/recommendations/${id}/downvote`)
+      .send();
+    const recommendationInDb = await prisma.recommendation.findFirst({
+      where: {
+        id,
+      },
+    });
+    expect(result.status).toEqual(200);
+    expect(recommendationInDb.score).toEqual(score - 1);
+  });
+
+  it("Caso sucesso: excluir recomendação quando ela for menor que -5", async () => {
+    const recommendation = recommendationFactory();
+    const { id } = await prisma.recommendation.create({
+      data: recommendation,
+    });
+    for (let i = 0; i < 5; i++) {
+      await supertest(app).post(`/recommendations/${id}/downvote`).send();
+    }
+    const result = await supertest(app)
+      .post(`/recommendations/${id}/downvote`)
+      .send();
+    const recommendationInDb = await prisma.recommendation.findFirst({
+      where: {
+        id,
+      },
+    });
+    expect(result.status).toEqual(200);
+    expect(recommendationInDb).toBeFalsy();
+  });
+
+  it("Caso erro: id inválido, retornar 404", async () => {
+    const result = await supertest(app)
+      .post("/recommendations/1/downvote")
+      .send();
+    expect(result.status).toEqual(404);
+  });
+});
