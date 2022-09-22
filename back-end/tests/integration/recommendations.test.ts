@@ -64,3 +64,29 @@ describe("Testes na rota Post: /recommendations", () => {
     expect(recommendationInBD.length).toEqual(1);
   });
 });
+
+describe("Testes na rota Post:/recommendations/:id/upvote", () => {
+  it("Caso sucesso: retornar 200 e acrescentar 1 ao score a cada requisição", async () => {
+    const recommendation = recommendationFactory();
+    const { id, score } = await prisma.recommendation.create({
+      data: recommendation,
+    });
+    const result = await supertest(app)
+      .post(`/recommendations/${id}/upvote`)
+      .send();
+    const recommendationInDb = await prisma.recommendation.findFirst({
+      where: {
+        id,
+      },
+    });
+    expect(result.status).toEqual(200);
+    expect(recommendationInDb.score).toEqual(score + 1);
+  });
+
+  it("Caso erro: id inválido, retornar 404", async () => {
+    const result = await supertest(app)
+      .post("/recommendations/1/upvote")
+      .send();
+    expect(result.status).toEqual(404);
+  });
+});
