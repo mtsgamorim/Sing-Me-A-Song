@@ -166,3 +166,23 @@ describe("Testes na rota GET /recommendations", () => {
     expect(result.body.length).toEqual(0);
   });
 });
+
+describe("Testes na rota GET /recommendations/:id", () => {
+  it("Teste sucesso: Retornar status 200 e o objeto com mesmo id", async () => {
+    const recommendation = recommendationsFactory();
+    const { id } = await prisma.recommendation.create({
+      data: recommendation,
+    });
+    const result = await supertest(app).get(`/recommendations/${id}`).send();
+    expect(result.status).toEqual(200);
+    expect(result.body.id).toEqual(id);
+    expect(result.body.name).toEqual(recommendation.name);
+    expect(result.body.youtubeLink).toEqual(recommendation.youtubeLink);
+  });
+  it("Teste erro: Retornar status 404", async () => {
+    const id = 1;
+    const result = await supertest(app).get(`/recommendations/${id}`).send();
+    expect(result.status).toEqual(404);
+    expect(result.body).toEqual({});
+  });
+});
