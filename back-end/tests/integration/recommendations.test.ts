@@ -6,6 +6,7 @@ import {
   recommendationsFactory,
   create15recommendationsInBD,
   create3recommendationsInBD,
+  create2recommendationsInBDWithScore,
 } from "../factory/recommendationFactory.js";
 
 beforeEach(async () => {
@@ -150,7 +151,7 @@ describe("Testes na rota GET /recommendations", () => {
     expect(result.body[0].id).toBeTruthy();
     expect(result.body[0].name).toBeTruthy();
     expect(result.body[0].youtubeLink).toBeTruthy();
-    expect(result.body[0].score).toEqual(0);
+    expect(result.body[0].score).toBeGreaterThanOrEqual(0);
   });
 
   it("Teste sucesso: Retornar status 200 e apenas as recomendaçoes criadas menores que 10", async () => {
@@ -184,5 +185,34 @@ describe("Testes na rota GET /recommendations/:id", () => {
     const result = await supertest(app).get(`/recommendations/${id}`).send();
     expect(result.status).toEqual(404);
     expect(result.body).toEqual({});
+  });
+});
+
+describe("Testes na rota GET /recommendations/random", () => {
+  it("Teste sucesso: Retornar status 200 e um objeto", async () => {
+    await create3recommendationsInBD();
+    const result = await supertest(app).get("/recommendations/random").send();
+    expect(result.status).toEqual(200);
+    expect(result.body.id).toBeTruthy();
+    expect(result.body.name).toBeTruthy();
+    expect(result.body.youtubeLink).toBeTruthy();
+    expect(result.body.score).toBeGreaterThanOrEqual(0);
+  });
+  it("Teste sucesso: Esperar porcentagem ser válida", async () => {
+    await create2recommendationsInBDWithScore();
+    let goodRecommendation = 0;
+    let badRecommendation = 0;
+    for (let i = 0; i < 1000; i++) {
+      const recommendation = await supertest(app)
+        .get("/recommendations/random")
+        .send();
+      if (recommendation.body.score > 10) {
+        goodRecommendation++;
+      } else {
+        badRecommendation++;
+      }
+    }
+    expect(goodRecommendation / 1000).toBeGreaterThan(0.6);
+    expect(badRecommendation / 1000).toBeGreaterThan(0.2);
   });
 });

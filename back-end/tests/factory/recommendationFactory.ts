@@ -31,3 +31,19 @@ export async function create3recommendationsInBD() {
     await prisma.recommendation.create({ data: recommendation });
   }
 }
+
+export async function create2recommendationsInBDWithScore() {
+  const youtube = `https://www.youtube.com/watch?v=${faker.lorem.word()}`;
+  const recommendation = {
+    name: "Recomendação score alto",
+    youtubeLink: youtube,
+    score: 11,
+  };
+  const recommendation2 = {
+    name: "Recomendação score baixo",
+    youtubeLink: youtube,
+    score: 10,
+  };
+  await prisma.recommendation.create({ data: recommendation });
+  await prisma.recommendation.create({ data: recommendation2 });
+}
