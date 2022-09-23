@@ -4,10 +4,10 @@ import { faker } from "@faker-js/faker";
 import app from "../../src/app.js";
 import {
   recommendationsFactory,
-  create15recommendationsInBD,
-  create3recommendationsInBD,
-  create2recommendationsInBDWithScore,
-  create10recommendationsInBDWithScore,
+  create15RecommendationsInDB,
+  create3RecommendationsInDB,
+  create2RecommendationsInDBWithScore,
+  create10RecommendationsInDBWithScore,
 } from "../factory/recommendationFactory.js";
 
 beforeEach(async () => {
@@ -145,7 +145,7 @@ describe("Testes na rota Post:/recommendations/:id/downvote", () => {
 
 describe("Testes na rota GET /recommendations", () => {
   it("Teste sucesso: Retornar status 200 e 10 recomendações", async () => {
-    await create15recommendationsInBD();
+    await create15RecommendationsInDB();
     const result = await supertest(app).get("/recommendations").send();
     expect(result.status).toEqual(200);
     expect(result.body.length).toEqual(10);
@@ -156,7 +156,7 @@ describe("Testes na rota GET /recommendations", () => {
   });
 
   it("Teste sucesso: Retornar status 200 e apenas as recomendaçoes criadas menores que 10", async () => {
-    await create3recommendationsInBD();
+    await create3RecommendationsInDB();
     const result = await supertest(app).get("/recommendations").send();
     expect(result.status).toEqual(200);
     expect(result.body.length).toEqual(3);
@@ -191,7 +191,7 @@ describe("Testes na rota GET /recommendations/:id", () => {
 
 describe("Testes na rota GET /recommendations/random", () => {
   it("Teste sucesso: Retornar status 200 e um objeto", async () => {
-    await create3recommendationsInBD();
+    await create3RecommendationsInDB();
     const result = await supertest(app).get("/recommendations/random").send();
     expect(result.status).toEqual(200);
     expect(result.body.id).toBeTruthy();
@@ -200,7 +200,7 @@ describe("Testes na rota GET /recommendations/random", () => {
     expect(result.body.score).toBeGreaterThanOrEqual(0);
   });
   it("Teste sucesso: Esperar porcentagem ser válida", async () => {
-    await create2recommendationsInBDWithScore();
+    await create2RecommendationsInDBWithScore();
     let goodRecommendation = 0;
     let badRecommendation = 0;
     for (let i = 0; i < 1000; i++) {
@@ -227,7 +227,7 @@ describe("Testes na rota GET /recommendations/random", () => {
 
 describe("Testes na rota GET /recommendations/top/:amount", () => {
   it("Teste sucesso: Deve retornar status 200, a quantidade escolhida e em ordem de score", async () => {
-    await create10recommendationsInBDWithScore();
+    await create10RecommendationsInDBWithScore();
     const amount = 3;
     const result = await supertest(app)
       .get(`/recommendations/top/${amount}`)
@@ -241,7 +241,7 @@ describe("Testes na rota GET /recommendations/top/:amount", () => {
     expect(result.body[0].youtubeLink).toBeTruthy();
   });
   it("Teste sucesso: Caso do amount ser 0", async () => {
-    await create10recommendationsInBDWithScore();
+    await create10RecommendationsInDBWithScore();
     const amount = 0;
     const result = await supertest(app)
       .get(`/recommendations/top/${amount}`)
