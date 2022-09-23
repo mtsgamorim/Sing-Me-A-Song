@@ -7,6 +7,7 @@ import {
   create15recommendationsInBD,
   create3recommendationsInBD,
   create2recommendationsInBDWithScore,
+  create10recommendationsInBDWithScore,
 } from "../factory/recommendationFactory.js";
 
 beforeEach(async () => {
@@ -214,5 +215,38 @@ describe("Testes na rota GET /recommendations/random", () => {
     }
     expect(goodRecommendation / 1000).toBeGreaterThan(0.6);
     expect(badRecommendation / 1000).toBeGreaterThan(0.2);
+  });
+  it("Teste erro: Não existe ainda recommendations no DB", async () => {
+    const recommendation = await supertest(app)
+      .get("/recommendations/random")
+      .send();
+    expect(recommendation.status).toEqual(404);
+    expect(recommendation.body).toEqual({});
+  });
+});
+
+describe("Testes na rota GET /recommendations/top/:amount", () => {
+  it("Teste sucesso: Deve retornar status 200, a quantidade escolhida e em ordem de score", async () => {
+    await create10recommendationsInBDWithScore();
+    const amount = 3;
+    const result = await supertest(app)
+      .get(`/recommendations/top/${amount}`)
+      .send();
+    expect(result.status).toEqual(200);
+    expect(result.body.length).toEqual(amount);
+    expect(result.body[0].score).toBeGreaterThanOrEqual(result.body[1].score);
+    expect(result.body[1].score).toBeGreaterThanOrEqual(result.body[2].score);
+    expect(result.body[0].id).toBeTruthy();
+    expect(result.body[0].name).toBeTruthy();
+    expect(result.body[0].youtubeLink).toBeTruthy();
+  });
+  it("Teste sucesso: Caso do amount ser 0", async () => {
+    await create10recommendationsInBDWithScore();
+    const amount = 0;
+    const result = await supertest(app)
+      .get(`/recommendations/top/${amount}`)
+      .send();
+    expect(result.body).toEqual([]);
+    expect(result.status).toEqual(200);
   });
 });

@@ -47,3 +47,15 @@ export async function create2recommendationsInBDWithScore() {
   await prisma.recommendation.create({ data: recommendation });
   await prisma.recommendation.create({ data: recommendation2 });
 }
+
+export async function create10recommendationsInBDWithScore() {
+  for (let i = 0; i < 10; i++) {
+    const youtube = `https://www.youtube.com/watch?v=${faker.lorem.word()}`;
+    const recommendation = {
+      name: faker.lorem.words(3),
+      youtubeLink: youtube,
+      score: faker.datatype.number({ min: -5, max: 100 }),
+    };
+    await prisma.recommendation.create({ data: recommendation });
+  }
+}
