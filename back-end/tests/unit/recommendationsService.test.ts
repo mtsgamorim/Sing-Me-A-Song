@@ -1,6 +1,10 @@
 import { recommendationService } from "../../src/services/recommendationsService.js";
 import { recommendationRepository } from "../../src/repositories/recommendationRepository.js";
-import { recommendationsFactory } from "../factory/recommendationFactory.js";
+import {
+  recommendationsBadScore,
+  recommendationsFactory,
+  recommendationsGoodScore,
+} from "../factory/recommendationFactory.js";
 import { conflictError, notFoundError } from "../../src/utils/errorUtils.js";
 import { recommendationFactoryData } from "../factory/recommendationFactory.js";
 
@@ -9,7 +13,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("Teste da função insert", () => {
+describe("Testes da função insert", () => {
   it("Teste sucesso", async () => {
     const recommendation = recommendationsFactory();
     jest
@@ -39,7 +43,7 @@ describe("Teste da função insert", () => {
   });
 });
 
-describe("Teste da função getById", () => {
+describe("Testes da função getById", () => {
   it("Teste sucesso", async () => {
     const recommendation = recommendationFactoryData();
     jest
@@ -59,7 +63,7 @@ describe("Teste da função getById", () => {
   });
 });
 
-describe("Teste da função upvote", () => {
+describe("Testes da função upvote", () => {
   it("Teste sucesso", async () => {
     const recommendation = recommendationFactoryData();
     jest
@@ -73,7 +77,7 @@ describe("Teste da função upvote", () => {
   });
 });
 
-describe("Teste da função downvote", () => {
+describe("Testes da função downvote", () => {
   it("Teste sucesso", async () => {
     const recommendation = recommendationFactoryData();
     jest
@@ -110,7 +114,7 @@ describe("Teste da função downvote", () => {
   });
 });
 
-describe("Teste da função get", () => {
+describe("Testes da função get", () => {
   it("Teste sucesso", async () => {
     jest
       .spyOn(recommendationRepository, "findAll")
@@ -120,7 +124,7 @@ describe("Teste da função get", () => {
   });
 });
 
-describe("Teste da função getTop", () => {
+describe("Testes da função getTop", () => {
   it("Teste sucesso", async () => {
     const amount = 1;
     jest
@@ -128,5 +132,64 @@ describe("Teste da função getTop", () => {
       .mockImplementationOnce((): any => {});
     const result = await recommendationService.getTop(amount);
     expect(recommendationRepository.getAmountByScore).toBeCalled();
+  });
+});
+
+describe("Testes da função getRandom", () => {
+  it("Teste sucesso: Retornar scores altos", async () => {
+    const recommendations = recommendationsGoodScore();
+    const random = 0.5;
+
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => recommendations);
+    jest.spyOn(global.Math, "random").mockImplementationOnce((): any => random);
+
+    const result = await recommendationService.getRandom();
+    expect(result).not.toBe(null);
+    expect(recommendationRepository.findAll).toBeCalledTimes(1);
+  });
+
+  it("Teste sucesso, Retornar scores baixos", async () => {
+    const recommendation = recommendationsBadScore();
+    const random = 0.8;
+
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => recommendation);
+    jest.spyOn(global.Math, "random").mockImplementationOnce((): any => random);
+
+    const result = await recommendationService.getRandom();
+    expect(result).not.toBe(null);
+    expect(recommendationRepository.findAll).toBeCalledTimes(1);
+  });
+
+  it("Teste sucoess, Retornar recomendação qualquer", async () => {
+    const recommendation = recommendationsBadScore();
+    const random = 0.5;
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => []);
+
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => recommendation);
+
+    jest.spyOn(global.Math, "random").mockImplementationOnce((): any => random);
+
+    const result = await recommendationService.getRandom();
+
+    expect(result).not.toBe(null);
+    expect(recommendationRepository.findAll).toBeCalledTimes(2);
+  });
+
+  it("Caso erro, não existe recomendações", async () => {
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementation((): any => []);
+    const result = recommendationService.getRandom();
+
+    await expect(result).rejects.toEqual(notFoundError());
+    expect(recommendationRepository.findAll).toBeCalledTimes(2);
   });
 });

@@ -70,3 +70,33 @@ export function recommendationFactoryData() {
   };
   return recommendation;
 }
+
+export function recommendationsGoodScore() {
+  const youtube = `https://www.youtube.com/watch?v=${faker.lorem.word()}`;
+  const result = [];
+  for (let i = 0; i < 5; i++) {
+    const recommendation = {
+      id: faker.datatype.number(100),
+      name: faker.lorem.words(3),
+      youtubeLink: youtube,
+      score: faker.datatype.number({ min: 11, max: 100 }),
+    };
+    result.push(recommendation);
+  }
+  return result;
+}
+
+export function recommendationsBadScore() {
+  const youtube = `https://www.youtube.com/watch?v=${faker.lorem.word()}`;
+  const result = [];
+  for (let i = 0; i < 5; i++) {
+    const recommendation = {
+      id: faker.datatype.number(100),
+      name: faker.lorem.words(3),
+      youtubeLink: youtube,
+      score: faker.datatype.number({ min: -5, max: 10 }),
+    };
+    result.push(recommendation);
+  }
+  return result;
+}
