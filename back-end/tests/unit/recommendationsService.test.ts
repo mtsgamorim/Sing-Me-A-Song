@@ -109,3 +109,24 @@ describe("Teste da função downvote", () => {
     expect(recommendationRepository.remove).toBeCalled();
   });
 });
+
+describe("Teste da função get", () => {
+  it("Teste sucesso", async () => {
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => {});
+    const result = await recommendationService.get();
+    expect(recommendationRepository.findAll).toBeCalled();
+  });
+});
+
+describe("Teste da função getTop", () => {
+  it("Teste sucesso", async () => {
+    const amount = 1;
+    jest
+      .spyOn(recommendationRepository, "getAmountByScore")
+      .mockImplementationOnce((): any => {});
+    const result = await recommendationService.getTop(amount);
+    expect(recommendationRepository.getAmountByScore).toBeCalled();
+  });
+});
