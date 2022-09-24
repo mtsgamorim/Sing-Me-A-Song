@@ -58,3 +58,54 @@ describe("Teste da função getById", () => {
     expect(result).rejects.toEqual(notFoundError());
   });
 });
+
+describe("Teste da função upvote", () => {
+  it("Teste sucesso", async () => {
+    const recommendation = recommendationFactoryData();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => recommendation);
+    jest
+      .spyOn(recommendationRepository, "updateScore")
+      .mockImplementationOnce((): any => recommendation);
+    await recommendationService.upvote(recommendation.id);
+    expect(recommendationRepository.updateScore).toBeCalled();
+  });
+});
+
+describe("Teste da função downvote", () => {
+  it("Teste sucesso", async () => {
+    const recommendation = recommendationFactoryData();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => recommendation);
+    jest
+      .spyOn(recommendationRepository, "updateScore")
+      .mockImplementationOnce((): any => recommendation);
+    await recommendationService.downvote(recommendation.id);
+    expect(recommendationRepository.updateScore).toBeCalled();
+  });
+
+  it("Teste sucesso, porém score menor que -5", async () => {
+    const recommendation = recommendationFactoryData();
+    const recommendationUpdated = {
+      id: recommendation.id,
+      name: recommendation.name,
+      youtubeLink: recommendation.youtubeLink,
+      score: -6,
+    };
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => recommendation);
+    jest
+      .spyOn(recommendationRepository, "updateScore")
+      .mockImplementationOnce((): any => recommendationUpdated);
+    jest
+      .spyOn(recommendationRepository, "remove")
+      .mockImplementationOnce((): any => {});
+
+    await recommendationService.downvote(recommendation.id);
+    expect(recommendationRepository.updateScore).toBeCalled();
+    expect(recommendationRepository.remove).toBeCalled();
+  });
+});
