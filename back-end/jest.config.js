@@ -25,6 +25,7 @@ export default {
     "<rootDir>/src/schemas",
     "<rootDir>/src/app.ts",
     "<rootDir>/src/database.ts",
+    "<rootDir>/src/services/testService.ts",
     "<rootDir>/tests/factory",
   ],
 };
