@@ -50,3 +50,39 @@ describe("Testes em criar recomendações", () => {
     });
   });
 });
+
+describe("Testes de votos", () => {
+  it("Caso sucesso: voto positivo", () => {
+    cy.generateRecommendation();
+    cy.visit("http://localhost:3000");
+    cy.intercept("GET", "http://localhost:5000/recommendations").as("get");
+
+    cy.get("[data-cy=up]").click();
+    cy.wait("@get");
+
+    cy.get("[data-cy=score]").should("contain", 1);
+  });
+
+  it("Caso sucesso: voto negativo", () => {
+    cy.generateRecommendation();
+    cy.visit("http://localhost:3000");
+    cy.intercept("GET", "http://localhost:5000/recommendations").as("get");
+
+    cy.get("[data-cy=down]").click();
+    cy.wait("@get");
+
+    cy.get("[data-cy=score]").should("contain", -1);
+  });
+
+  it("Caso sucesso: automaticamente deletar recomendação com -6 votos", () => {
+    cy.generateRecommendation();
+    cy.visit("http://localhost:3000");
+    cy.intercept("GET", "http://localhost:5000/recommendations").as("get");
+
+    for (let i = 0; i < 6; i++) {
+      cy.get("[data-cy=down]").click();
+      cy.wait("@get");
+    }
+    cy.get("[data-cy=empty]").should("be.visible");
+  });
+});
