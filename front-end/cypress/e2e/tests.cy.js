@@ -130,12 +130,12 @@ describe("Testes de troca de páginas", () => {
       "https://www.youtube.com/watch?v=T3Y6RRSDm4o&list=RDT3Y6RRSDm4o&start_radio=1&ab_channel=CanaldoPeric%C3%A3o"
     );
 
-    cy.intercept("POST", "http://localhost:5000/recommendations").as("post");
-    cy.intercept("GET", "http://localhost:5000/recommendations").as("get");
+    cy.intercept("POST", "http://localhost:5000/recommendations").as("post2");
+    cy.intercept("GET", "http://localhost:5000/recommendations").as("get2");
 
     cy.get("[data-cy=submit]").click();
-    cy.wait("@post");
-    cy.wait("@get");
+    cy.wait("@post2");
+    cy.wait("@get2");
 
     //Vote ONE
 
