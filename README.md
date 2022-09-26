@@ -7,7 +7,7 @@
 
 ## :clipboard: Descrição
 
-Sing me a song é uma aplicação para recomendação anônima de músicas.Quanto mais pessoas curtirem uma recomendação, maior a chance dela ser recomendada para outras pessoas.
+Sing me a song é uma aplicação para recomendação anônima de músicas. Quanto mais pessoas curtirem uma recomendação, maior a chance dela ser recomendada para outras pessoas.
 
 ---
 
