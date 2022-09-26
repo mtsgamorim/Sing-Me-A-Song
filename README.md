@@ -1,7 +1,7 @@
 # <p align = "center"> Projeto Sing me a Song </p>
 
 <p align = "center">
-   <img src="https://img.shields.io/badge/author-SEU_NOME-4dae71?style=flat-square" />
+   <img src="https://img.shields.io/badge/author-Matheus Amorim-4dae71?style=flat-square" />
    <img src="https://img.shields.io/github/languages/count/mtsgamorim/Sing-Me-A-Song?color=4dae71&style=flat-square" />
 </p>
 
